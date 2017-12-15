@@ -2,9 +2,8 @@
 #include <vector>
 
 class SkewHeap : virtual IHeap {
-public:
-    class Node {
-    public:
+private:
+    struct Node {
         int key;
         Node *l, *r;
 
@@ -15,9 +14,12 @@ public:
                 r(NULL) {}
 
         Node& operator=(const Node& other) = default;
-    };
 
-    std::vector<Node*> heaps;
+        ~Node() {
+            delete l;
+            delete r;
+        }
+    };
 
     Node* _meld(Node* l, Node* r) {
         if (l == NULL)
@@ -34,6 +36,9 @@ public:
         return l;
     }
 
+    std::vector<Node*> heaps;
+
+public:
     void AddHeap(int key) {
         heaps.push_back(new Node(key));
     }
@@ -51,6 +56,12 @@ public:
     }
 
     void Meld(int index1, int index2) {
-        _meld(heaps[index1], heaps[index2]);
+        heaps[index1] = _meld(heaps[index1], heaps[index2]);
+        heaps[index2] = NULL;
+    }
+
+    ~SkewHeap() {
+        for (Node* i : heaps)
+            delete i;
     }
 };

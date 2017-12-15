@@ -4,10 +4,11 @@
 
 class StlHeap : virtual IHeap {
 public:
-    std::vector<std::set<int> > heaps;
+    std::vector<std::multiset<int> > heaps;
 
     void AddHeap(int key) {
-        heaps.push_back(std::set<int> { key });
+        heaps.push_back(std::multiset<int>());
+        heaps.back().insert(key);
     }
 
     void Insert(int index, int key) {
@@ -23,8 +24,9 @@ public:
     }
 
     void Meld(int index1, int index2) {
-        for (int i : heaps[index2])
-            heaps[index1].insert(i);
+        if (heaps[index1].size() < heaps[index2].size())
+            swap(heaps[index1], heaps[index2]);
+        heaps[index1].insert(heaps[index2].begin(), heaps[index2].end());
         heaps[index2].clear();
     }
 };

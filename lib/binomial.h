@@ -1,12 +1,11 @@
 #include "base.h"
+#include <iostream>
+#include <climits>
 #include <vector>
 
 class BinomialHeap : virtual IHeap {
-public:
-    const int INF = 1e9;
-
-    class Node {
-    public:
+private:
+    struct Node {
         int key;
         std::vector<Node*> children;
 
@@ -14,10 +13,14 @@ public:
         Node(int key) :
                 key(key),
                 children(std::vector<Node*>(0)) {};
+
+        ~Node() {
+            for (Node* i : children)
+                delete i;
+        }
     };
 
-    class Heap {
-    public:
+    struct Heap {
         std::vector<Node*> roots;
 
         Heap() = default;
@@ -27,6 +30,11 @@ public:
 
         Heap(int key) :
                 roots(std::vector<Node*>{new Node(key)}) {}
+
+        ~Heap() {
+            for (Node* i : roots)
+                delete i;
+        }
     };
 
     Node* _nxt(Node* l, Node* r) {
@@ -102,6 +110,7 @@ public:
 
     std::vector<Heap*> heaps;
 
+public:
     void AddHeap(int key) {
         heaps.push_back(new Heap(key));
     }
@@ -111,7 +120,7 @@ public:
     }
 
     int GetMin(int index) {
-        int ret = INF;
+        int ret = INT_MAX;
         for (auto i : heaps[index]->roots)
             if (i != NULL)
                 ret = std::min(ret, i->key);
@@ -119,7 +128,8 @@ public:
     }
 
     void ExtractMin(int index) {
-        int ret = INF, where;
+        int ret = INT_MAX;
+        size_t where;
         for (int i = 0; i < heaps[index]->roots.size(); i++)
             if (heaps[index]->roots[i] != NULL && ret > heaps[index]->roots[i]->key) {
                 ret = heaps[index]->roots[i]->key;
@@ -134,5 +144,11 @@ public:
 
     void Meld(int index1, int index2) {
         heaps[index1] = _meld(heaps[index1], heaps[index2]);
+        heaps[index2] = new Heap();
+    }
+
+    ~BinomialHeap() {
+        for (Heap* i : heaps)
+            delete i;
     }
 };

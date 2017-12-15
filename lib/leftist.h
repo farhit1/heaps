@@ -2,9 +2,8 @@
 #include <vector>
 
 class LeftistHeap : virtual IHeap {
-public:
-    class Node {
-    public:
+private:
+    struct Node {
         int key;
         int dist;
         Node *l, *r;
@@ -15,6 +14,11 @@ public:
                 dist(0),
                 l(NULL),
                 r(NULL) {}
+
+        ~Node() {
+            delete l;
+            delete r;
+        }
     };
 
     int dist(Node *l) {
@@ -28,7 +32,7 @@ public:
             return r;
         if (r == NULL)
             return l;
-        if (l->key < r->key)
+        if (l->key > r->key)
             std::swap(l, r);
         l->r = _meld(l->r, r);
         if (dist(l->r) > dist(l->l))
@@ -39,6 +43,7 @@ public:
 
     std::vector<Node*> heaps;
 
+public:
     void AddHeap(int key) {
         heaps.push_back(new Node(key));
     }
@@ -56,6 +61,12 @@ public:
     }
 
     void Meld(int index1, int index2) {
-        _meld(heaps[index1], heaps[index2]);
+        heaps[index1] = _meld(heaps[index1], heaps[index2]);
+        heaps[index2] = NULL;
+    }
+
+    ~LeftistHeap() {
+        for (Node* i : heaps)
+            delete i;
     }
 };
