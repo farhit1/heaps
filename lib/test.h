@@ -205,8 +205,8 @@ TYPED_TEST(HeapTest, large4) {
 			operationType = -1;
 
 		if (operationType == -2) {
-			int ind1 = rnd(0, (int)amount() - 1);
-			int ind2 = rnd(0, (int)amount() - 2);
+			int ind1 = rnd(0, amount() - 1);
+			int ind2 = rnd(0, amount() - 2);
 			if (ind2 >= ind1)
 				ind2++;
 			meld(ind1, ind2);
