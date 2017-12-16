@@ -2,26 +2,31 @@
 #include <iostream>
 #include <set>
 
-class StlHeap : virtual IHeap {
-public:
-    std::multiset<int> heap;
+class StlHeap : virtual public IHeap {
+private:
+    std::multiset<int> _heap;
 
+public:
     void Insert(int key) {
-        heap.insert(key);
+        _heap.insert(key);
+    }
+
+    size_t size() {
+        return _heap.size();
     }
 
     int GetMin() {
-        return *heap.begin();
+        return *_heap.begin();
     }
 
     void ExtractMin() {
-        heap.erase(heap.begin());
+        _heap.erase(_heap.begin());
     }
 
-    void Meld(StlHeap& other) {
-        if (heap.size() < other.heap.size())
-            std::swap(heap, other.heap);
-        heap.insert(other.heap.begin(), other.heap.end());
-        other.heap.clear();
+    void Meld(IHeap& other) {
+        if (_heap.size() < dynamic_cast<StlHeap&>(other)._heap.size())
+            std::swap(_heap, dynamic_cast<StlHeap&>(other)._heap);
+        _heap.insert(dynamic_cast<StlHeap&>(other)._heap.begin(), dynamic_cast<StlHeap&>(other)._heap.end());
+        dynamic_cast<StlHeap&>(other)._heap.clear();
     }
 };

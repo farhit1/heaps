@@ -2,7 +2,7 @@
 #include <climits>
 #include <vector>
 
-class BinomialHeap : virtual IHeap {
+class BinomialHeap : virtual public IHeap {
 private:
     struct Node {
         int key;
@@ -46,6 +46,34 @@ private:
         }
     }
 
+    void case1(Heap*& l, Heap*& r, Node*& remainder, size_t i) {
+        if (r->roots[i] != NULL)
+            l->roots[i] = r->roots[i];
+        if (remainder != NULL) {
+            l->roots[i] = remainder;
+            remainder = NULL;
+        }   
+    }
+
+    void case2(Heap*& l, Heap*& r, Node*& remainder, size_t i) {
+        Node* n1;
+        Node* n2;
+        if (l->roots[i] == NULL) {
+            n1 = r->roots[i];
+            n2 = remainder;
+        }
+        if (r->roots[i] == NULL) {
+            n1 = l->roots[i];
+            n2 = remainder;
+        }
+        if (remainder == NULL) {
+            n1 = l->roots[i];
+            n2 = r->roots[i];
+        }
+        l->roots[i] = NULL;
+        remainder = _nxt(n1, n2);
+    }
+
     Heap* _meld(Heap* l, Heap* r) {
         int maxsize = std::max(l->roots.size(), r->roots.size());
         while (l->roots.size() < maxsize)
@@ -61,46 +89,23 @@ private:
 
         Node* remainder = NULL;
         for (int i = 0; i < maxsize; i++) {
-            int notnull = 0;
-            if (remainder != NULL)
-                ++notnull;
-            if (l->roots[i] != NULL)
-                ++notnull;
-            if (r->roots[i] != NULL)
-                ++notnull;
+            int notnull = int(remainder != NULL) + int(l->roots[i] != NULL) + int(r->roots[i] != NULL);
 
-            if (notnull == 0)
-                continue;
-            if (notnull == 1) {
-                if (r->roots[i] != NULL)
-                    l->roots[i] = r->roots[i];
-                if (remainder != NULL) {
-                    l->roots[i] = remainder;
-                    remainder = NULL;
-                }
-                continue;
-            }
-            if (notnull == 2) {
-                Node *n1, *n2;
-                if (l->roots[i] == NULL) {
-                    n1 = r->roots[i];
-                    n2 = remainder;
-                }
-                if (r->roots[i] == NULL) {
-                    n1 = l->roots[i];
-                    n2 = remainder;
-                }
-                if (remainder == NULL) {
-                    n1 = l->roots[i];
-                    n2 = r->roots[i];
-                }
-                l->roots[i] = NULL;
-                remainder = _nxt(n1, n2);
-            }
-            if (notnull == 3) {
-                remainder = _nxt(r->roots[i], remainder);
+            switch (notnull) {
+                case 1:
+                    case1(l, r, remainder, i);
+                    break;
+                case 2:
+                    case2(l, r, remainder, i);
+                    break;
+                case 3:
+                    remainder = _nxt(r->roots[i], remainder);
+                    break;
+                default:
+                    break;
             }
         }
+
         if (remainder != NULL)
             l->roots.push_back(remainder);
 
@@ -140,9 +145,9 @@ public:
         _heap = _meld(_heap, tmp);
     }
 
-    void Meld(BinomialHeap& other) {
-        _heap = _meld(_heap, other._heap);
-        other._heap = new Heap();
+    void Meld(IHeap& other) {
+        _heap = _meld(_heap, dynamic_cast<BinomialHeap&>(other)._heap);
+        dynamic_cast<BinomialHeap&>(other)._heap = new Heap();
     }
 
     ~BinomialHeap() {

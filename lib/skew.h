@@ -5,18 +5,10 @@ class SkewHeap :
     virtual public ILeftistSkewHeap 
 {
 protected:
-    Node* _meld(Node* l, Node* r) {
-        if (l == NULL)
-            return r;
-        if (r == NULL)
-            return l;
-        if (l->key > r->key)
-            std::swap(l, r);
 
-        Node* tmp = l->r;
-        l->r = l->l;
-        l->l = _meld(r, tmp);
-
-        return l;
+    void inMeld(Node* left, Node* right) {
+        Node* tmp = left->right;
+        left->right = left->left;
+        left->left = _meld(right, tmp);
     }
 };

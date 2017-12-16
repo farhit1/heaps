@@ -5,17 +5,11 @@ class LeftistHeap :
     virtual public ILeftistSkewHeap
 {
 protected:
-    Node* _meld(Node* l, Node* r) {
-        if (l == NULL)
-            return r;
-        if (r == NULL)
-            return l;
-        if (l->key > r->key)
-            std::swap(l, r);
-        l->r = _meld(l->r, r);
-        if (dist(l->r) > dist(l->l))
-            std::swap(l->l, l->r);
-        l->dist = std::min(dist(l->l), dist(l->r)) + 1;
-        return l;
+
+    void inMeld(Node* left, Node* right) {
+        left->right = _meld(left->right, right);
+        if (dist(left->right) > dist(left->left))
+            std::swap(left->left, left->right);
+        left->dist = std::min(dist(left->left), dist(left->right)) + 1;
     }
 };

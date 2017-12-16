@@ -34,7 +34,7 @@ public:
 
 	// returns size of i-th heap
 	size_t _heapsize(size_t i) {
-		return _goodHeaps[i]->heap.size();
+		return _goodHeaps[i]->size();
 	}
 
 	// adds empty heap

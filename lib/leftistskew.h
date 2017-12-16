@@ -2,33 +2,46 @@
 
 #include "base.h"
 
-class ILeftistSkewHeap : virtual IHeap {
+class ILeftistSkewHeap : virtual public IHeap {
 protected:
     struct Node {
         int key;
         int dist;
-        Node *l, *r;
+        Node *left, *right;
 
         Node() { *this = NULL; }
         Node(int key) :
                 key(key),
                 dist(0),
-                l(nullptr),
-                r(nullptr) {}
+                left(nullptr),
+                right(nullptr) {}
 
         ~Node() {
-            delete l;
-            delete r;
+            delete left;
+            delete right;
         }
     };
 
-    int dist(Node *l) {
-        if (l == nullptr)
+    int dist(Node *left) {
+        if (left == nullptr)
             return 0;
-        return l->dist;
+        return left->dist;
     }
 
-    virtual Node* _meld(Node* l, Node* r) = 0;
+    virtual void inMeld(Node* left, Node* right) = 0;
+
+    Node* _meld(Node* left, Node* right) {
+        if (left == NULL)
+            return right;
+        if (right == NULL)
+            return left;
+        if (left->key > right->key)
+            std::swap(left, right);
+
+        inMeld(left, right);
+
+        return left;
+    }
 
     Node* _heap;
 
@@ -46,12 +59,12 @@ public:
     }
 
     void ExtractMin() {
-        _heap = _meld(_heap->l, _heap->r);
+        _heap = _meld(_heap->left, _heap->right);
     }
 
-    void Meld(ILeftistSkewHeap& other) {
-        _heap = _meld(_heap, other._heap);
-        other._heap = nullptr;
+    void Meld(IHeap& other) {
+        _heap = _meld(_heap, dynamic_cast<ILeftistSkewHeap&>(other)._heap);
+        dynamic_cast<ILeftistSkewHeap&>(other)._heap = nullptr;
     }
 
     ~ILeftistSkewHeap() {
