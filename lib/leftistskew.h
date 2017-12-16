@@ -2,35 +2,12 @@
 
 #include "base.h"
 
+template<typename T>
 class ILeftistSkewHeap : virtual public IHeap {
 protected:
-    struct Node {
-        int key;
-        int dist;
-        Node *left, *right;
+    virtual void inMeld(T*& left, T*& right) = 0;
 
-        Node() { *this = NULL; }
-        Node(int key) :
-                key(key),
-                dist(0),
-                left(nullptr),
-                right(nullptr) {}
-
-        ~Node() {
-            delete left;
-            delete right;
-        }
-    };
-
-    int dist(Node *left) {
-        if (left == nullptr)
-            return 0;
-        return left->dist;
-    }
-
-    virtual void inMeld(Node*& left, Node*& right) = 0;
-
-    Node* _meld(Node* left, Node* right) {
+    T* _meld(T*& left, T*& right) {
         if (left == NULL)
             return right;
         if (right == NULL)
@@ -43,15 +20,15 @@ protected:
         return left;
     }
 
-    Node* _heap;
+    T* _heap;
 
 public:
-
 	ILeftistSkewHeap() :
 		_heap(NULL) {}
 
     void Insert(int key) {
-        _heap = _meld(_heap, new Node(key));
+    	T* tmp = new T(key);
+        _heap = _meld(_heap, tmp);
     }
 
     int GetMin() {
