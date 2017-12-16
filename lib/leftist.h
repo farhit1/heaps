@@ -10,6 +10,5 @@ protected:
         left->right = _meld(left->right, right);
         if (dist(left->right) > dist(left->left))
             std::swap(left->left, left->right);
-        left->dist = std::min(dist(left->left), dist(left->right)) + 1;
     }
 };
