@@ -28,7 +28,7 @@ protected:
         return left->dist;
     }
 
-    virtual void inMeld(Node* left, Node* right) = 0;
+    virtual void inMeld(Node*& left, Node*& right) = 0;
 
     Node* _meld(Node* left, Node* right) {
         if (left == NULL)

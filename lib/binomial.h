@@ -36,7 +36,7 @@ private:
         }
     };
 
-    Node* _nxt(Node* l, Node* r) {
+    Node* _nxt(Node*& l, Node*& r) {
         if (l->key < r->key) {
             l->children.push_back(r);
             return l;
