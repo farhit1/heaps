@@ -1,5 +1,4 @@
 #include "base.h"
-#include <iostream>
 #include <climits>
 #include <vector>
 
@@ -9,7 +8,7 @@ private:
         int key;
         std::vector<Node*> children;
 
-        Node() = default;
+        Node() { *this = NULL; }
         Node(int key) :
                 key(key),
                 children(std::vector<Node*>(0)) {};
@@ -108,47 +107,45 @@ private:
         return l;
     }
 
-    std::vector<Heap*> heaps;
+    Heap* _heap;
 
 public:
-    void AddHeap(int key) {
-        heaps.push_back(new Heap(key));
+
+    BinomialHeap() :
+        _heap(new Heap) {}
+
+    void Insert(int key) {
+        _heap = _meld(_heap, new Heap(key));
     }
 
-    void Insert(int index, int key) {
-        heaps[index] = _meld(heaps[index], new Heap(key));
-    }
-
-    int GetMin(int index) {
+    int GetMin() {
         int ret = INT_MAX;
-        for (auto i : heaps[index]->roots)
+        for (auto i : _heap->roots)
             if (i != NULL)
                 ret = std::min(ret, i->key);
         return ret;
     }
 
-    void ExtractMin(int index) {
+    void ExtractMin() {
         int ret = INT_MAX;
         size_t where;
-        for (int i = 0; i < heaps[index]->roots.size(); i++)
-            if (heaps[index]->roots[i] != NULL && ret > heaps[index]->roots[i]->key) {
-                ret = heaps[index]->roots[i]->key;
+        for (int i = 0; i < _heap->roots.size(); i++)
+            if (_heap->roots[i] != NULL && ret > _heap->roots[i]->key) {
+                ret = _heap->roots[i]->key;
                 where = i;
             }
 
-        Heap* tmp = new Heap(heaps[index]->roots[where]->children);
-        heaps[index]->roots[where] = NULL;
-
-        heaps[index] = _meld(heaps[index], tmp);
+        Heap* tmp = new Heap(_heap->roots[where]->children);
+        _heap->roots[where] = NULL;
+        _heap = _meld(_heap, tmp);
     }
 
-    void Meld(int index1, int index2) {
-        heaps[index1] = _meld(heaps[index1], heaps[index2]);
-        heaps[index2] = new Heap();
+    void Meld(BinomialHeap& other) {
+        _heap = _meld(_heap, other._heap);
+        other._heap = new Heap();
     }
 
     ~BinomialHeap() {
-        for (Heap* i : heaps)
-            delete i;
+        delete _heap;
     }
 };

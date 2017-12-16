@@ -1,32 +1,10 @@
-#include "base.h"
-#include <vector>
+#include "leftistskew.h"
 
-class LeftistHeap : virtual IHeap {
-private:
-    struct Node {
-        int key;
-        int dist;
-        Node *l, *r;
-
-        Node() = default;
-        Node(int key) :
-                key(key),
-                dist(0),
-                l(NULL),
-                r(NULL) {}
-
-        ~Node() {
-            delete l;
-            delete r;
-        }
-    };
-
-    int dist(Node *l) {
-        if (l == NULL)
-            return 0;
-        return l->dist;
-    }
-
+class LeftistHeap :
+    virtual IHeap,
+    virtual public ILeftistSkewHeap
+{
+protected:
     Node* _meld(Node* l, Node* r) {
         if (l == NULL)
             return r;
@@ -39,34 +17,5 @@ private:
             std::swap(l->l, l->r);
         l->dist = std::min(dist(l->l), dist(l->r)) + 1;
         return l;
-    }
-
-    std::vector<Node*> heaps;
-
-public:
-    void AddHeap(int key) {
-        heaps.push_back(new Node(key));
-    }
-
-    void Insert(int index, int key) {
-        heaps[index] = _meld(heaps[index], new Node(key));
-    }
-
-    int GetMin(int index) {
-        return heaps[index]->key;
-    }
-
-    void ExtractMin(int index) {
-        heaps[index] = _meld(heaps[index]->l, heaps[index]->r);
-    }
-
-    void Meld(int index1, int index2) {
-        heaps[index1] = _meld(heaps[index1], heaps[index2]);
-        heaps[index2] = NULL;
-    }
-
-    ~LeftistHeap() {
-        for (Node* i : heaps)
-            delete i;
     }
 };
